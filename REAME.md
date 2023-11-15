@@ -12,3 +12,6 @@ Then
 firefox --private-windows hhtp://localhost:808/vnc.html
 '''
 
+# Reference
+
+main settings from [docker-novnc](https://github.com/theasp/docker-novnc)
