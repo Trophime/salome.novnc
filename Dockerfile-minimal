@@ -1,0 +1,114 @@
+# syntax=docker/dockerfile:1
+FROM debian:bullseye
+
+ARG VERSION=9.11.0
+ARG MGVERSION=2.14-4
+ARG BOOSTVERSION=1.74.0
+ARG PLATFORM=DB11
+ARG DESTDIR=/opt
+ARG SRC=SALOME-9.11.0-native-DB11-SRC-d96fc2df4ccabe85eb692ab99354e558.tar.gz
+ARG CFG=SALOME-9.11.0-Minimal-HIFIMAGNET-DB11.pyconf
+#ARG ARM=salome_arm64.pyconf
+ARG PYCONF=SALOME-9.11.0-Minimal-HIFIMAGNET-DB11
+
+# Avoid warnings by switching to noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Setup demo environment variables
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# Install pre-requisite packages 
+RUN uname -a \
+    && apt-get -qq update \
+    && apt-get -y upgrade \
+    && apt-get -y install git-lfs sudo \
+    && apt-get -y install debian-keyring lsb-release \
+    && ln -s /usr/share/keyrings/debian-maintainers.gpg /etc/apt/trusted.gpg.d \
+    && apt-get -y install firefox-esr lsb-release wget sudo \
+    # Install pre-requiste packages  \
+    && apt-get -y install wget net-tools  \
+    && apt-get -y install emacs-nox vim-nox  \
+    && apt-get -y install git git-lfs cmake  flex bison swig doxygen autotools-dev autoconf automake libtool  
+    
+RUN apt-get -y install python-is-python3 python3-distro python3-apt libpython3-dev \
+           python3-psutil python3-memory-profiler python3-sip python3-six \
+           python3-requests python3-click python3-pyparsing python3-pygments \
+           python3-mpi4py python3-nose python3-numpydoc python3-numpy python3-scipy python3-matplotlib \
+	   python3-stemmer python3-sphinx-rtd-theme python3-sphinxcontrib.websupport sphinx-intl \
+	   python3-pint python3-yaml python3-psutil python3-memory-profiler \
+           python3-markupsafe python3-jinja2 python3-imagesize python3-docutils python3-pytest-cython python3-babel python3-alabaster \
+	   cython3 python3-setuptools python3-toml python3-statsmodels python3-sip-dev \
+    # specific for Salome 9.11 \
+    && apt-get -y install pypy-setuptools
+
+RUN apt-get -y install g++ libgfortran5 clang llvm-dev
+    
+RUN apt-get -y install mesa-common-dev mesa-utils libxt-dev libxmu-dev libfontconfig1-dev libtbb-dev libxft-dev \
+           libxcb-dri2-0-dev libxkbcommon-dev libxkbcommon-x11-dev libxi-dev libxpm-dev libxss1 \ 
+	   libncurses5 libopengl0
+RUN DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install \
+           libboost-filesystem${BOOSTVERSION} libboost-system${BOOSTVERSION} libboost-serialization${BOOSTVERSION} libboost-thread${BOOSTVERSION} \
+	   libboost-regex${BOOSTVERSION}  libboost-date-time${BOOSTVERSION}  libboost-chrono${BOOSTVERSION}  libboost-atomic${BOOSTVERSION} \
+           libboost-all-dev
+	   
+RUN DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install libqwt-qt5-6 libqt5xml5 libqt5printsupport5 libqt5test5 libqt5x11extras5 libqt5help5 \
+           qttools5-dev libqt5svg5-dev libqt5x11extras5-dev qtxmlpatterns5-dev-tools \
+           pyqt5-dev pyqt5-dev-tools libfreeimage-dev libqwt-qt5-dev python3-pyqt5 
+	   
+RUN apt-get -y install libfreeimage3 \
+           libcgraph6 libgvc6 libgraphviz-dev graphviz
+
+RUN apt-get -y install \
+           libmetis-dev libscotch-dev \
+	   libcppunit-1.15-0 libcppunit-dev liblapack-dev libopenblas-dev \
+           libopenblas-pthread-dev libcminpack-dev libeigen3-dev \
+	   libfftw3-dev  fftw-dev libgomp1 \
+           libgsl-dev \
+	   # if not arm \
+    	   && apt-get -y install libquadmath0
+    
+RUN apt-get -y install tcl-dev tk-dev
+
+RUN apt-get -y install libreadline-dev libgdal-dev \
+    && apt-get -y install libcurl4-openssl-dev libxcursor-dev \
+    && apt-get -y install libexif12 libgphoto2-6 libraw1394-11 libdc1394-25 libgphoto2-port12 libtiff5-dev libgtk2.0-0
+
+RUN apt-get -y install texlive-latex-base  texlive-latex-extra dvipng
+    
+
+# Install Salome
+COPY ${SRC} /tmp
+RUN echo SRC ${SRC} \
+    && echo DESTDIR ${DESTDIR} \
+    && mkdir -p ${DESTDIR}/DISTENE \
+    && cd ${DESTDIR} \
+    && ls -lrth /tmp \
+    && ls -lrth /opt \
+    && tar zvxf /tmp/${SRC} \
+    && pwd \
+    && ls -lrth \
+    && echo "create SALOME-${VERSION}-${PLATFORM}" \
+    && mv SALOME-${VERSION}-native-${PLATFORM}-SRC SALOME-${VERSION}-${PLATFORM} \
+    && cd SALOME-${VERSION}-${PLATFORM}  \
+    && find ./INSTALL -name \*.pyconf | xargs perl -pi -e "s|/volatile/projet/salome/jenkins/workspace/SALOMEBuilder|${DESTDIR}/SALOME-${VERSION}-${PLATFORM}|g" \
+    && rm -f /tmp/${SRC}
+
+COPY ${CFG} /tmp
+RUN cd ${DESTDIR}/SALOME-${VERSION}-${PLATFORM} \
+    && cp /tmp/${CFG} PROJECT/applications
+
+#COPY ${ARM} /tmp
+#RUN cp /tmp/${ARM} PROJECT/products/salome_system.pyconf
+
+# RUN cd ${DESTDIR}/SALOME-${VERSION}-${PLATFORM} \
+#     && ./install_bin-.sh \
+#     && ./sat/sat config --list \
+#     && ./sat/sat prepare ${PYCONF} \
+#     && ./sat/sat compile ${PYCONF} \
+#     && ./sat/sat launcher ${PYCONF} \
+#     && ./sat/sat launcher ${PYCONF} --use_mesa --name mesa_salome \
+#     && ./sat/sat package ${PYCONF} --binaries

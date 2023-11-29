@@ -1,0 +1,214 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
+APPLICATION :
+{
+  name : 'SALOME-9.11.0'
+  workdir : $LOCAL.workdir 
+  tag : 'V9_11_0'
+  dev : 'no'
+  verbose : 'no'
+  debug : 'no'
+  base : 'no'
+  python3 : 'yes'
+  platform :
+  [
+    'FD32'
+    'FD34'
+    'FD36'
+    'FD37'
+    'FD38'
+    'CO8'
+    'DB10'
+    'DB11'
+    'UB20.04'
+    'UB22.04'
+  ]
+  environ :
+  {
+    build :
+    {
+      CONFIGURATION_ROOT_DIR : $workdir + $VARS.sep + 'SOURCES' + $VARS.sep + 'CONFIGURATION'
+      RESTRICTED_ROOT_DIR : $workdir + $VARS.sep + 'SOURCES' + $VARS.sep + 'RESTRICTED'
+      SALOME_USE_64BIT_IDS : '1'
+      VTK_SMP_IMPLEMENTATION_TYPE : 'TBB'
+      # OpenMP # choose among: sequential / OpenMP / TBB switches
+      SALOME_GMSH_HEADERS_STD : '1'
+    }
+    launch :
+    {
+      PYTHONIOENCODING : 'UTF_8'
+      SALOME_MODULES_ORDER : 'GEOM:SMESH'
+      ROOT_SALOME_INSTALL : '$PRODUCT_ROOT_DIR'
+      SALOME_ON_DEMAND : 'HIDE'
+    }
+    SALOME_trace : 'local'
+    # local/file:.../with_logger
+    SALOME_MODULES : 'GEOM,SMESH'
+    PRODUCT_ROOT_DIR : $workdir
+  }
+  products :
+  {
+    # PREREQUISITES :
+    alabaster : 'native'
+    Babel : 'native'
+    boost : 'native'
+    CAS :
+    {
+      tag : 'V7_5_3p5'
+      section : 'version_CR753_SALOME_PATCH'
+      base : 'no'
+    }
+    catalyst : '2.0'
+    C3PO : 'v2.0'
+    certifi : 'native'
+    cgns : '4.2.0'
+    chardet : 'native'
+    click : 'native'
+    cmake : '3.25.2'
+    cppunit : 'native'
+    cminpack : 'native'
+    cycler : 'native'
+    Cython : 'native'
+    dateutil : 'native'
+    docutils : 'native'
+    doxygen : 'native'
+    eigen : 'native'
+    embree : '3.12.2'
+    FMILibrary : '2.0.3'
+    fftw : 'native'
+    freeimage : 'native'
+    freetype : 'native'
+    gl2ps : 'native'
+    gdal : 'native'
+    gmsh : '4.10.3'
+    graphviz : 'native'
+    hdf5 : '1.10.3'
+    idna : 'native'
+    imagesize : 'native'
+    ispc : '1.15.0'
+    Jinja2 : 'native'
+    kiwisolver : 'native'
+    lapack : 'native'
+    libxml2 : 'native'
+    llvm : 'native'
+    markupsafe : 'native'
+    matplotlib : 'native'
+    medfile : '4.1.1'
+    mesa :
+    {
+      tag : '19.0.8-x86_64-' + $VARS.dist
+      base : 'no'
+      section : 'version_bin'
+    }
+    # MeshGems : '2.15-1'
+    metis : 'native'
+    mpi4py : 'native'
+    netgen : '5.3.1_with_CAS_7.2'
+    # comment out line above and uncomment the line below to use Netgen 6.
+    #netgen : '6.2.2101'
+    netcdf : 'native'
+    nlopt : '2.4.2'
+    nose : 'native'
+    numpy : 'native'
+    numpydoc : 'native'
+    omniORB : '4.2.5'
+    omniORBpy : '4.2.5'
+    opencv : '3.2.0'
+    openmpi : 'native'
+    ParaView :
+    {
+      tag : '5.11.0'
+      base : 'no'
+      section : 'version_5_11_0_MPI'
+      hpc : 'yes'
+    }
+    packaging : 'native'
+    packagespy : '74152cd'
+    pandas : 'native'
+    Pillow : 'native'
+    planegcs : '0.18-3cb6890'
+    psutil : 'native'
+    PyFMI : {'tag': '2.6', 'base': 'no', 'section': 'version_2_6_no_pip'}
+    Pygments : 'native'
+    pyparsing : 'native'
+    PyQt : 'native'
+    pyreadline : 'native'
+    Python : 'native'
+    pytz : 'native'
+    qt : 'native'
+    qwt : 'native'
+    requests : 'native'
+    scipy : 'native'
+    scotch :
+    {
+      tag : '6.1.2'
+      section : 'version_6_1_2_MPI'
+      hpc : 'yes'
+      base : 'no'
+    }
+    setuptools : 'native'
+    sip : 'native'
+    six : 'native'
+    snowballstemmer : 'native'
+    Sphinx : 'native'
+    sphinxcontrib_websupport : 'native'
+    sphinxintl : 'native'
+    sphinx_rtd_theme : 'native'
+    statsmodels : 'native'
+    swig : 'native'
+    salome_system : 'native'
+    tbb : 'native'
+    tcl : 'native'
+    tk : 'native'
+    toml : 'native'
+    TTK : 'f8dafde2d7'
+    urllib3 : 'native'
+    zeromq : '4.3.1'
+    # SALOME MODULES :
+    CONFIGURATION : True
+    SALOME : True
+    LIBBATCH : 'V2_4_6'
+    KERNEL : True
+    MEDCOUPLING :
+    {
+      tag : 'V9_11_0'
+      base : 'no'
+      section : 'default_MPI'
+      hpc : 'yes'
+    }
+    GUI : True
+    GEOM : True
+    SMESH : True
+    NETGENPLUGIN : True
+    #BLSURFPLUGIN : True
+    #GHS3DPLUGIN : True
+    #HYBRIDPLUGIN : True
+    #HexoticPLUGIN : True
+    GMSHPLUGIN : True
+    HEXABLOCK : True
+    HEXABLOCKPLUGIN : True
+    DOCUMENTATION : True
+    SAMPLES : True
+    COMPONENT : True
+    #MGKeyGen : {tag :'0.0.2'}
+  }
+  profile :
+  {
+    launcher_name : 'salome'
+  }
+  test_base :
+  {
+    name : 'SALOME'
+    tag : 'SalomeV9'
+  }
+  properties :
+  {
+    mesa_launcher_in_package : 'yes'
+    repo_dev : 'yes'
+    pip : 'yes'
+    pip_install_dir : 'python'
+    single_install_dir : 'no'
+    use_mesa : 'no'
+  }
+}
